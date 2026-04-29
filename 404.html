@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MÜV MVP — Move Smart. Breathe Easy.</title>
+  <style>
+    :root{
+      --muv-blue:#0E4DB8;
+      --muv-blue-2:#0655BE;
+      --navy:#0A2540;
+      --soft:#E8F0FB;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:#dbeafe;
+      --green:#16A34A;
+      --amber:#F59E0B;
+      --red:#DC2626;
+      --bg:#f8fbff;
+      --card:#fff;
+      --shadow:0 22px 60px rgba(10,37,64,.12);
+      --radius:26px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);}
+    body{min-height:100vh;overflow-x:hidden}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer;border:0}
+    .hidden{display:none!important}
+    .sr{position:absolute;left:-9999px}
+    .app{min-height:100vh;display:flex;flex-direction:column}
+    .small-logo{height:28px;object-fit:contain;display:block}
+    .topbar{position:sticky;top:0;z-index:80;background:rgba(255,255,255,.82);backdrop-filter:blur(18px);border-bottom:1px solid rgba(14,77,184,.1);display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,3vw,34px)}
+    .top-left{display:flex;align-items:center;gap:16px}
+    .status-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(14,77,184,.15);background:var(--soft);color:var(--muv-blue);border-radius:999px;padding:8px 12px;font-weight:800;font-size:12px;letter-spacing:.02em}
+    .primary-tabs{display:flex;gap:8px;align-items:center;overflow-x:auto;padding-bottom:2px}
+    .tab{padding:10px 13px;border-radius:999px;color:var(--navy);background:transparent;font-weight:850;font-size:13px;white-space:nowrap}
+    .tab.active{background:var(--muv-blue);color:#fff;box-shadow:0 10px 24px rgba(14,77,184,.28)}
+    .tab.secondary{border:1px solid rgba(14,77,184,.18);background:#fff;color:var(--muv-blue)}
+    .main{width:min(1200px,calc(100% - 28px));margin:22px auto 80px;}
+    .card{background:rgba(255,255,255,.94);border:1px solid rgba(14,77,184,.11);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(18px,3vw,34px)}
+    .section-title{font-size:clamp(30px,5vw,60px);line-height:.95;margin:0;color:var(--navy);letter-spacing:-.06em}
+    .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muv-blue);font-weight:950;margin-bottom:10px}
+    .subhead{font-size:clamp(16px,2vw,20px);color:var(--muted);line-height:1.45;max-width:760px;margin:12px 0 0}
+    .grid{display:grid;gap:16px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .field{display:flex;flex-direction:column;gap:8px;position:relative}
+    label{font-size:12px;color:var(--navy);font-weight:900;letter-spacing:.02em}
+    input,select,textarea{width:100%;padding:13px 14px;border:1px solid rgba(14,77,184,.18);border-radius:16px;background:#fff;color:var(--ink);outline:none;box-shadow:0 8px 20px rgba(10,37,64,.04)}
+    input:focus,select:focus,textarea:focus{border-color:var(--muv-blue);box-shadow:0 0 0 4px rgba(14,77,184,.11)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:999px;padding:13px 18px;font-weight:950;background:var(--navy);color:#fff;box-shadow:0 12px 28px rgba(10,37,64,.18);transition:.2s transform,.2s box-shadow,.2s opacity;white-space:nowrap}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 17px 36px rgba(10,37,64,.22)}
+    .btn.primary{background:var(--muv-blue)}
+    .btn.ghost{background:#fff;color:var(--muv-blue);border:1px solid rgba(14,77,184,.18);box-shadow:none}
+    .btn.success{background:var(--green)}
+    .btn.warn{background:var(--amber)}
+    .btn.small{padding:9px 12px;font-size:12px}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .spread{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .pill{border:1px solid rgba(14,77,184,.16);background:#fff;color:var(--navy);border-radius:999px;padding:9px 12px;font-size:12px;font-weight:850;display:inline-flex;align-items:center;gap:7px}
+    .pill.blue{background:var(--soft);color:var(--muv-blue)}
+    .pill.green{background:#ecfdf5;color:var(--green);border-color:rgba(22,163,74,.2)}
+    .pill.amber{background:#fffbeb;color:#b45309;border-color:rgba(245,158,11,.2)}
+    .pill.red{background:#fef2f2;color:var(--red);border-color:rgba(220,38,38,.2)}
+    .suggestions{position:absolute;z-index:30;top:74px;left:0;right:0;background:#fff;border:1px solid rgba(14,77,184,.14);border-radius:18px;box-shadow:0 18px 38px rgba(10,37,64,.16);overflow:hidden;max-height:230px;overflow-y:auto}
+    .suggestions button{display:block;width:100%;text-align:left;padding:12px 14px;background:#fff;border-bottom:1px solid #eef4ff;color:var(--navy);font-weight:750}
+    .suggestions button:hover{background:var(--soft)}
+
+    /* Opening: one big wordmark, one truck CTA, then garage-door reveal */
+    .opening{position:fixed;inset:0;z-index:1000;background:#02060f;display:grid;place-items:center;overflow:hidden;color:#fff;isolation:isolate}
+    .opening:before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 50% 28%,rgba(14,77,184,.34),transparent 34%),radial-gradient(circle at 20% 80%,rgba(6,85,190,.16),transparent 26%);filter:blur(4px);animation:openingGlow 4s ease-in-out infinite alternate;z-index:-2}
+    .opening:after{content:"";position:absolute;left:0;right:0;bottom:0;height:28vh;background:linear-gradient(180deg,transparent,rgba(14,77,184,.12));z-index:-1}
+    .opening-inner{width:min(1080px,92vw);height:min(760px,92vh);text-align:center;position:relative;display:grid;grid-template-rows:auto 1fr;align-items:center;padding:clamp(24px,4vw,46px) 0 80px}
+    .hero-wordmark{width:min(820px,88vw);height:auto;margin:0 auto;display:block;filter:drop-shadow(0 24px 44px rgba(14,77,184,.22));animation:wordIn .85s cubic-bezier(.2,.8,.2,1) both;transform-origin:center}
+    .launch-stage{position:relative;align-self:end;width:min(760px,88vw);height:210px;margin:0 auto 6vh;display:grid;place-items:center}
+    .hero-road{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:100%;height:92px;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(14,77,184,.22),transparent)}
+    .hero-road:before,.hero-road:after{content:"";position:absolute;left:7%;right:7%;height:6px;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);animation:roadPulse 1.4s linear infinite}.hero-road:before{top:30px}.hero-road:after{bottom:25px;animation-delay:.35s}
+    .truck-launch{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);width:300px;height:156px;background:transparent;border:0;padding:0;display:grid;place-items:center;filter:drop-shadow(0 28px 28px rgba(0,0,0,.35));animation:truckIdle 1.65s ease-in-out infinite;transition:filter .2s ease;z-index:3}
+    .truck-launch:focus-visible{outline:4px solid rgba(255,255,255,.8);outline-offset:10px;border-radius:24px}
+    .truck-launch img{width:100%;height:auto;display:block;pointer-events:none}
+    .truck-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);background:#fff;color:var(--muv-blue);border:3px solid rgba(14,77,184,.24);border-radius:999px;padding:11px 20px;font-size:18px;font-weight:950;letter-spacing:-.02em;box-shadow:0 16px 35px rgba(10,37,64,.24);white-space:nowrap;pointer-events:none}
+    .truck-launch:hover .truck-label{transform:translate(-50%,-64%) scale(1.03)}
+    .speed-lines{position:absolute;left:calc(50% - 320px);bottom:88px;width:230px;height:74px;opacity:.0;transition:opacity .25s;pointer-events:none}.speed-lines span{position:absolute;right:0;height:8px;border-radius:999px;background:linear-gradient(90deg,transparent,#0E4DB8);animation:speedLine .45s linear infinite}.speed-lines span:nth-child(1){top:4px;width:180px}.speed-lines span:nth-child(2){top:32px;width:230px;animation-delay:.08s}.speed-lines span:nth-child(3){top:60px;width:150px;animation-delay:.16s}
+    .opening.zip .speed-lines{opacity:1}.opening.zip .truck-launch{animation:truckLaunch .82s cubic-bezier(.1,.8,.18,1) forwards}.opening.zip .hero-wordmark{animation:wordExit .7s cubic-bezier(.4,0,.2,1) forwards}.opening.zip .hero-road{animation:roadExit .7s ease forwards}
+    .garage-reveal{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;transition:opacity .14s ease;background:transparent}.opening.garage-opening .garage-reveal{opacity:1}.reveal-panel{position:absolute;left:0;width:100%;height:50%;background:linear-gradient(180deg,#0A2540,#0E4DB8);box-shadow:0 0 0 1px rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.4);display:grid;place-items:center}.reveal-panel.top{top:0;border-bottom:2px solid rgba(255,255,255,.25)}.reveal-panel.bottom{bottom:0;border-top:2px solid rgba(255,255,255,.25)}.reveal-slat{width:min(760px,82vw);height:7px;border-radius:999px;background:rgba(255,255,255,.22);box-shadow:0 26px 0 rgba(255,255,255,.16),0 52px 0 rgba(255,255,255,.12)}.reveal-copy{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:24;background:#fff;color:var(--muv-blue);border-radius:999px;padding:12px 18px;font-weight:950;letter-spacing:.02em;box-shadow:0 24px 50px rgba(0,0,0,.22)}.opening.garage-opening .reveal-panel.top{animation:garageLiftTop 1.08s .18s cubic-bezier(.77,0,.18,1) forwards}.opening.garage-opening .reveal-panel.bottom{animation:garageLiftBottom 1.08s .18s cubic-bezier(.77,0,.18,1) forwards}.opening.garage-opening .reveal-copy{animation:garageCopyOut .55s .2s ease forwards}
+    @keyframes openingGlow{to{transform:scale(1.05) translateY(-1%)}}
+    @keyframes wordIn{from{opacity:0;transform:scale(.92) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    @keyframes wordExit{to{opacity:0;transform:scale(.86) translateY(-20px);filter:blur(8px)}}
+    @keyframes truckIdle{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-7px)}}
+    @keyframes truckLaunch{0%{transform:translateX(-50%) translateY(0) scale(1)}18%{transform:translateX(-68%) translateY(2px) scale(1.02)}100%{transform:translateX(132vw) translateY(-8px) scale(1.05);filter:drop-shadow(-45px 18px 18px rgba(14,77,184,.28)) blur(.4px)}}
+    @keyframes roadPulse{from{transform:translateX(20%);opacity:.2}to{transform:translateX(-20%);opacity:.75}}
+    @keyframes speedLine{from{transform:translateX(44px);opacity:0}50%{opacity:1}to{transform:translateX(-34px);opacity:0}}
+    @keyframes roadExit{to{opacity:0;transform:translateX(-50%) scaleX(1.08)}}
+    @keyframes garageLiftTop{to{transform:translateY(-104%)}}
+    @keyframes garageLiftBottom{to{transform:translateY(104%)}}
+    @keyframes garageCopyOut{to{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+    @media(max-width:700px){.opening-inner{height:86vh;padding-bottom:70px}.hero-wordmark{width:min(620px,88vw)}.launch-stage{height:180px;margin-bottom:5vh}.truck-launch{width:240px}.truck-label{font-size:15px;padding:9px 16px}.speed-lines{left:calc(50% - 265px);transform:scale(.82);transform-origin:right center}}
+
+    /* Home scene */
+    .home-scene{min-height:360px;border-radius:32px;overflow:hidden;position:relative;background:linear-gradient(155deg,#dbeafe,#fff 52%,#f8fbff);border:1px solid rgba(14,77,184,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7)}
+    .sky{position:absolute;inset:0;background:linear-gradient(180deg,#a9d4ff 0%,#f9fbff 58%,#f0f7ff 100%);transition:.4s}
+    .scene-night .sky{background:linear-gradient(180deg,#06172f,#0A2540 54%,#16365f)}
+    .scene-evening .sky{background:linear-gradient(180deg,#ffa87d,#ffd6a1 42%,#f7fbff)}
+    .scene-morning .sky{background:linear-gradient(180deg,#ffddb0,#c6e3ff 60%,#f7fbff)}
+    .sun{position:absolute;right:10%;top:12%;width:68px;height:68px;border-radius:50%;background:#fff2a8;box-shadow:0 0 70px #ffe28a}
+    .scene-night .sun{background:#f8fafc;width:52px;height:52px;box-shadow:0 0 36px rgba(255,255,255,.52)}
+    .house{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);width:min(720px,82vw);height:260px}
+    .building{position:absolute;bottom:0;left:10%;width:80%;height:210px;background:#fff;border:5px solid #dbeafe;border-radius:28px 28px 16px 16px;box-shadow:0 24px 50px rgba(10,37,64,.12)}
+    .roof{position:absolute;left:6%;bottom:190px;width:88%;height:90px;background:var(--muv-blue);clip-path:polygon(0 70%,50% 0,100% 70%,95% 100%,5% 100%);}
+    .door{position:absolute;bottom:0;left:45%;width:75px;height:118px;background:var(--navy);border-radius:18px 18px 0 0;overflow:hidden}
+    .garage{position:absolute;bottom:0;left:14%;width:180px;height:110px;background:#dbeafe;border-radius:18px 18px 0 0;overflow:hidden;border:4px solid #bfdbfe}
+    .garage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#fff 0,#fff 13px,#e8f0fb 14px,#e8f0fb 18px);transform:translateY(0);animation:garageOpen 1.1s .35s ease forwards}
+    .window{position:absolute;width:80px;height:62px;background:#e8f0fb;border-radius:16px;border:4px solid #bfdbfe;box-shadow:inset 0 0 0 5px rgba(255,255,255,.45)}
+    .window.w1{left:38%;top:72px}.window.w2{right:17%;top:72px}
+    .scene-night .window{background:#ffeaa8;box-shadow:0 0 32px rgba(255,234,168,.55),inset 0 0 0 5px rgba(255,255,255,.25)}
+    .tiny-truck{position:absolute;left:20%;bottom:20px;width:120px;animation:parkTruck 1.3s .4s ease both;filter:drop-shadow(0 16px 16px rgba(10,37,64,.15))}
+    @keyframes garageOpen{to{transform:translateY(-86px)}}
+    @keyframes parkTruck{from{transform:translateX(-340px)}to{transform:translateX(0)}}
+    .home-form{margin-top:-44px;position:relative;z-index:3}
+    .form-section{padding-top:12px;margin-top:18px;border-top:1px solid #edf4ff}
+    .select-card{padding:14px;border-radius:18px;border:1px solid rgba(14,77,184,.13);background:#fff;display:flex;align-items:center;gap:10px;font-weight:850;color:var(--navy);cursor:pointer}
+    .select-card.active{background:var(--soft);border-color:var(--muv-blue);box-shadow:0 0 0 3px rgba(14,77,184,.08)}
+    input[type="checkbox"]{width:auto;box-shadow:none}
+
+    /* Scanner */
+    .scanner{position:fixed;inset:0;z-index:900;background:#020617;color:#fff;display:flex;flex-direction:column}
+    .scanner-top{height:70px;display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.12);background:rgba(2,6,23,.8);backdrop-filter:blur(16px);overflow-x:auto}
+    .room-chip{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04);color:#fff;padding:9px 12px;border-radius:999px;font-weight:850;white-space:nowrap;font-size:12px}
+    .room-chip.active{background:var(--muv-blue);border-color:var(--muv-blue)}
+    .scanner-body{display:grid;grid-template-rows:minmax(0,1fr) 30%;height:calc(100vh - 70px)}
+    .camera{position:relative;overflow:hidden;background:#111827}
+    .room-illustration{position:absolute;inset:0;background:linear-gradient(180deg,#172554,#0f172a);}
+    .room-illustration:before{content:"";position:absolute;left:8%;right:8%;top:10%;height:55%;background:linear-gradient(120deg,rgba(255,255,255,.13),rgba(255,255,255,.03));border-radius:26px;transform:perspective(500px) rotateX(7deg)}
+    .floor{position:absolute;left:-5%;right:-5%;bottom:-10%;height:42%;background:linear-gradient(0deg,#0a1024,#1e293b);transform:skewY(-2deg)}
+    .scan-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(14,77,184,.18),transparent);width:35%;animation:shimmer 2.2s linear infinite;mix-blend-mode:screen}
+    @keyframes shimmer{from{transform:translateX(-120%)}to{transform:translateX(360%)}}
+    .scan-indicator{position:absolute;left:18px;top:18px;background:rgba(2,6,23,.58);border:1px solid rgba(255,255,255,.14);padding:10px 14px;border-radius:999px;font-size:13px;font-weight:950;display:flex;align-items:center;gap:8px}
+    .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 rgba(22,163,74,.7);animation:pulseDot 1.4s infinite}
+    @keyframes pulseDot{70%{box-shadow:0 0 0 11px rgba(22,163,74,0)}}
+    .scan-box{position:absolute;border:2px solid #60a5fa;background:rgba(14,77,184,.1);border-radius:14px;box-shadow:0 0 0 4px rgba(14,77,184,.18),0 0 32px rgba(96,165,250,.36);animation:boxPulse 1.2s infinite}
+    .scan-label{position:absolute;top:-36px;left:0;background:var(--muv-blue);color:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:950;white-space:nowrap}
+    @keyframes boxPulse{50%{border-color:#bfdbfe;box-shadow:0 0 0 8px rgba(14,77,184,.09),0 0 38px rgba(96,165,250,.5)}}
+    .prompt{position:absolute;background:#fff;color:var(--navy);border-radius:24px;padding:14px;min-width:230px;box-shadow:0 28px 70px rgba(0,0,0,.35);border:1px solid rgba(14,77,184,.14);z-index:5}
+    .prompt strong{display:block;font-size:18px;letter-spacing:-.03em;margin-bottom:3px}
+    .inventory-panel{background:#fff;color:var(--ink);border-radius:28px 28px 0 0;margin-top:-20px;position:relative;z-index:4;padding:14px 16px 16px;overflow:auto;border-top:1px solid rgba(14,77,184,.13)}
+    .meter{height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    .meter > span{display:block;height:100%;background:linear-gradient(90deg,var(--muv-blue),#3b82f6);border-radius:999px;transition:width .25s}
+    .mini-truck-meter{height:48px;border:3px solid var(--muv-blue);border-radius:12px 18px 18px 12px;position:relative;overflow:hidden;background:#f8fbff;width:120px}
+    .mini-truck-meter:after{content:"";position:absolute;right:-22px;top:16px;width:34px;height:28px;background:var(--muv-blue);clip-path:polygon(0 0,65% 0,100% 100%,0 100%)}
+    .mini-truck-meter .fill{height:100%;background:rgba(14,77,184,.2);transition:width .25s}
+    .items-list{display:grid;gap:8px;margin-top:10px;max-height:170px;overflow:auto}
+    .item-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:9px 10px;border:1px solid #e5efff;border-radius:14px;background:#f8fbff;font-size:13px}
+    .qty{display:flex;align-items:center;gap:6px}.qty button{width:24px;height:24px;border-radius:50%;background:#e8f0fb;color:var(--muv-blue);font-weight:950}
+
+    /* Cards/modules */
+    .summary-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}
+    .metric{padding:16px;border-radius:20px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid rgba(14,77,184,.12)}
+    .metric b{display:block;font-size:24px;color:var(--navy);letter-spacing:-.04em}.metric span{font-size:12px;color:var(--muted);font-weight:800}
+    .quote-card,.vendor-card,.pool-card,.portal-card{border:1px solid rgba(14,77,184,.12);border-radius:24px;background:#fff;padding:18px;box-shadow:0 14px 32px rgba(10,37,64,.08)}
+    .quote-price{font-size:36px;letter-spacing:-.06em;color:var(--navy);font-weight:950;margin:10px 0}
+    .avatar{width:48px;height:48px;border-radius:16px;background:var(--soft);display:grid;place-items:center;color:var(--muv-blue);font-weight:950;font-size:20px}
+    .route-map{height:150px;border-radius:22px;background:linear-gradient(135deg,#e8f0fb,#fff);border:1px solid #dbeafe;position:relative;overflow:hidden}
+    .route-map:before{content:"";position:absolute;left:14%;top:60%;width:72%;height:4px;background:var(--muv-blue);border-radius:999px;transform:rotate(-13deg);box-shadow:0 0 0 6px rgba(14,77,184,.08)}
+    .route-map .pin{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--muv-blue);box-shadow:0 0 0 7px rgba(14,77,184,.15)}
+    .route-map .pin.a{left:16%;top:58%}.route-map .pin.b{right:17%;top:36%}
+    .tracking-truck{position:absolute;width:42px;left:45%;top:43%;animation:drive 3.5s ease-in-out infinite}
+    @keyframes drive{0%,100%{transform:translate(-20px,16px)}50%{transform:translate(20px,-16px)}}
+    .timeline{display:grid;gap:12px;margin-top:12px}.timeline-item{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}.check{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:950}.pending{background:#dbeafe;color:var(--muv-blue)}
+    .chat-box{border:1px solid #e5efff;border-radius:22px;overflow:hidden;background:#f8fbff}.chat-messages{height:210px;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px}.msg{max-width:78%;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #e5efff;font-size:13px}.msg.me{align-self:flex-end;background:var(--muv-blue);color:#fff}.chat-input{display:flex;gap:8px;padding:10px;background:#fff;border-top:1px solid #e5efff}.chat-input input{border-radius:999px}
+    .footer{width:min(1200px,calc(100% - 28px));margin:0 auto 30px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.footer button{background:none;color:var(--muv-blue);font-weight:850}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.5);z-index:950;display:grid;place-items:center;padding:18px}.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:28px;padding:24px;box-shadow:0 40px 90px rgba(0,0,0,.3)}
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}.table th{text-align:left;font-size:12px;color:var(--muted);padding:0 8px}.table td{background:#f8fbff;border-top:1px solid #e5efff;border-bottom:1px solid #e5efff;padding:10px 8px;font-size:13px}.table td:first-child{border-left:1px solid #e5efff;border-radius:14px 0 0 14px}.table td:last-child{border-right:1px solid #e5efff;border-radius:0 14px 14px 0}
+
+
+    /* Inline brand assets: no broken image tags, no external files required */
+    .brand-link{display:inline-flex;align-items:center;background:transparent;border:0;padding:0;color:var(--navy);text-align:left}
+    .logo-wordmark{display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;line-height:.86;color:var(--navy);letter-spacing:-.06em;white-space:nowrap}
+    .logo-main{font-weight:1000;font-size:34px;line-height:.82;letter-spacing:-.075em;color:inherit}
+    .logo-tag{margin-top:6px;font-size:7px;line-height:1;letter-spacing:.16em;font-weight:1000;color:inherit;opacity:.88}
+    .small-logo{height:auto;min-width:74px;display:inline-flex}
+    .small-logo .logo-main{font-size:29px}.small-logo .logo-tag{font-size:5.6px;margin-top:5px}
+    .hero-logo{width:min(820px,88vw);margin:0 auto;text-align:center;align-items:center;filter:drop-shadow(0 24px 44px rgba(14,77,184,.22));animation:wordIn .85s cubic-bezier(.2,.8,.2,1) both;transform-origin:center;color:#fff}
+    .hero-logo .logo-main{font-size:clamp(76px,16vw,172px);letter-spacing:-.08em;line-height:.76}.hero-logo .logo-tag{font-size:clamp(10px,1.5vw,17px);letter-spacing:.22em;margin-top:16px;color:#dbeafe;opacity:1}
+    .truck-svg{display:block;overflow:visible}.truck-box-svg{fill:#fff;stroke:var(--muv-blue);stroke-width:8}.truck-cab-svg{fill:#e8f0fb;stroke:var(--muv-blue);stroke-width:8;stroke-linejoin:round}.truck-window-svg{fill:#bfdbfe}.truck-line-svg{stroke:var(--muv-blue);stroke-width:9;stroke-linecap:round}.truck-wheel-svg{fill:#0A2540;stroke:#fff;stroke-width:7}
+    .truck-launch .truck-svg{width:100%;height:auto;pointer-events:none}.truck-launch img{display:none}
+    .tiny-truck.truck-svg{position:absolute;left:20%;bottom:20px;width:120px;animation:parkTruck 1.3s .4s ease both;filter:drop-shadow(0 16px 16px rgba(10,37,64,.15))}
+    .tracking-truck.truck-svg{position:absolute;width:42px;height:auto;left:45%;top:43%;animation:drive 3.5s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(10,37,64,.14))}
+    .opening .launch-stage:before{content:"Tap the truck to start";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:rgba(219,234,254,.72)}
+    .opening.zip .launch-stage:before{opacity:0}
+
+    /* Mover portal visual system — closer to the attached mobile reference */
+    .portal-mode .topbar,.portal-mode .footer{display:none}.portal-mode .main{width:100%;margin:0}.portal-mode{background:#eaf3fb}
+    .portal-app{min-height:100vh;background:#eaf3fb;color:var(--navy)}
+    .portal-header{position:sticky;top:0;z-index:80;background:#092b49;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 18px 44px rgba(9,43,73,.16)}
+    .portal-header-inner{max-width:1240px;margin:0 auto;padding:30px clamp(22px,4vw,48px) 26px}
+    .portal-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+    .portal-brand{background:transparent;color:#fff;border:0;padding:0;text-align:left;display:inline-flex}.portal-brand .logo-main{font-size:64px;letter-spacing:-.08em}.portal-brand .logo-tag{font-size:8px;margin-top:8px;letter-spacing:.2em;color:#eaf3fb;opacity:.92}
+    .portal-customer-link{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:10px 14px;font-weight:950;white-space:nowrap}
+    .portal-tabs{display:flex;align-items:center;gap:16px;overflow-x:auto;scrollbar-width:none;padding:28px 0 0}.portal-tabs::-webkit-scrollbar{display:none}
+    .portal-tab{flex:0 0 auto;background:transparent;color:rgba(255,255,255,.78);border-radius:18px;padding:15px 20px;font-size:20px;font-weight:1000;letter-spacing:-.04em;white-space:nowrap}.portal-tab.active{background:rgba(255,255,255,.14);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}.portal-tab:hover{background:rgba(255,255,255,.1);color:#fff}
+    .portal-body{max-width:1240px;margin:0 auto;padding:36px clamp(22px,4vw,48px) 80px}
+    .portal-kicker{display:inline-flex;border:2px solid #cfe1fb;background:#f4f9ff;color:var(--muv-blue);border-radius:999px;padding:9px 22px;font-size:16px;font-weight:1000;letter-spacing:-.02em;margin-bottom:24px}
+    .portal-title{font-size:clamp(44px,6vw,78px);line-height:.88;letter-spacing:-.07em;margin:0;color:#082847;font-weight:1000}.portal-subhead{font-size:clamp(20px,2.6vw,32px);line-height:1.35;color:#66758a;font-weight:850;max-width:900px;margin:18px 0 28px;letter-spacing:-.04em}
+    .portal-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:20px}.portal-wide{grid-column:span 3}.portal-split{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:22px}.portal-list-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:20px}.portal-card{background:#fff;border:2px solid #d8e8fb;border-radius:30px;padding:26px;box-shadow:0 8px 18px rgba(10,37,64,.04)}.portal-card h3{margin:0 0 18px;color:#082847;font-size:25px;line-height:1;font-weight:1000;letter-spacing:-.055em}.portal-card p{color:#66758a;font-weight:800;line-height:1.45}.portal-stat-number{display:block;font-size:58px;line-height:.9;font-weight:1000;letter-spacing:-.07em;color:#082847;margin:34px 0}.portal-muted{color:#66758a;font-weight:900}.portal-inventory-preview{border:2px solid #d8e8fb;border-radius:24px;overflow:hidden;background:#fbfdff}.portal-inventory-head,.portal-inventory-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:18px 22px;border-bottom:2px solid #e5effc}.portal-inventory-row:last-child{border-bottom:0}.portal-inventory-head{background:#fff}.portal-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:999px;background:#e8f1ff;border:2px solid #cfe1fb;color:var(--muv-blue);font-weight:1000}.portal-badge.warn{background:#fff8df;border-color:#ffde74;color:#a34e05;padding:0 14px}.portal-mini-table{width:100%;border-collapse:separate;border-spacing:0 10px}.portal-mini-table td,.portal-mini-table th{padding:14px;background:#fbfdff;border-top:1px solid #d8e8fb;border-bottom:1px solid #d8e8fb;text-align:left;color:#082847;font-weight:850}.portal-mini-table th{color:#66758a;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.portal-mini-table td:first-child,.portal-mini-table th:first-child{border-left:1px solid #d8e8fb;border-radius:16px 0 0 16px}.portal-mini-table td:last-child,.portal-mini-table th:last-child{border-right:1px solid #d8e8fb;border-radius:0 16px 16px 0}
+    @media(max-width:880px){.portal-header-inner{padding:48px 24px 26px}.portal-brand .logo-main{font-size:58px}.portal-brand .logo-tag{font-size:7px}.portal-customer-link{font-size:13px;padding:8px 11px}.portal-tabs{gap:14px;padding-top:34px}.portal-tab{font-size:28px;border-radius:20px;padding:20px 24px}.portal-body{padding:30px 26px 64px}.portal-kicker{font-size:25px;padding:13px 22px;margin-bottom:28px}.portal-title{font-size:68px}.portal-subhead{font-size:30px;line-height:1.45;margin-bottom:34px}.portal-dashboard-grid,.portal-list-grid,.portal-split{grid-template-columns:1fr}.portal-wide{grid-column:auto}.portal-card{border-radius:30px;padding:28px}.portal-card h3{font-size:30px}.portal-stat-number{font-size:62px}.portal-mini-table{font-size:14px}}
+
+    @media(max-width:880px){.grid.two,.grid.three,.grid.four,.summary-bar{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.primary-tabs{width:100%}.home-scene{min-height:280px}.house{transform:translateX(-50%) scale(.78);transform-origin:bottom center}.scanner-body{grid-template-rows:minmax(0,1fr) 38%}.section-title{font-size:40px}.quote-price{font-size:30px}.main{margin-top:14px}}
+  </style>
+</head>
+<body>
+  <div class="opening" id="opening" aria-label="MÜV launch animation">
+    <div class="opening-inner">
+      <div class="hero-wordmark logo-wordmark hero-logo" role="img" aria-label="MÜV — Move Smart. Breathe Easy."><span class="logo-main">MÜV</span><span class="logo-tag">MOVE SMART. BREATHE EASY.</span></div>
+      <div class="launch-stage" aria-hidden="false">
+        <div class="hero-road"></div>
+        <div class="speed-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+        <button class="truck-launch" id="bookBtn" aria-label="Book a MÜV">
+          <svg class="truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg>
+          <span class="truck-label">Book a MÜV</span>
+        </button>
+      </div>
+    </div>
+    <div class="garage-reveal" aria-hidden="true">
+      <div class="reveal-panel top"><div class="reveal-slat"></div></div>
+      <div class="reveal-copy">Opening your move</div>
+      <div class="reveal-panel bottom"><div class="reveal-slat"></div></div>
+    </div>
+  </div>
+
+  <div class="app hidden" id="app">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="brand-link" id="brandHome" aria-label="Go to MÜV home"><span class="logo-wordmark small-logo" aria-hidden="true"><span class="logo-main">MÜV</span><span class="logo-tag">MOVE SMART. BREATHE EASY.</span></span></button>
+        <span class="status-chip"><span class="dot"></span><span id="appStatus">Ready to book</span></span>
+      </div>
+      <nav class="primary-tabs" aria-label="Primary navigation">
+        <button class="tab active" data-tab="home">Home</button>
+        <button class="tab" data-tab="pool">MÜVPool</button>
+        <button class="tab" data-tab="muvit">MÜVIt</button>
+        <button class="tab" data-tab="market">MÜVMarket</button>
+        <button class="tab" data-tab="mymuv">MyMÜV</button>
+      </nav>
+    </header>
+    <main class="main" id="main"></main>
+    <footer class="footer">
+      <span>© 2026 MÜV · Move Smart. Breathe Easy.</span>
+      <span><button id="moverPortalBtn">For Movers</button> · Privacy · Terms · Contact</span>
+    </footer>
+  </div>
+
+  <div id="scannerMount"></div>
+  <div id="modalMount"></div>
+
+<script>
+(function(){
+  const BLUE = '#0E4DB8';
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const toISO = d => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const money = cents => '$' + Math.round(cents/100).toLocaleString();
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+  const state = JSON.parse(localStorage.getItem('muvState.v1') || 'null') || {
+    activeTab:'home', flow:'details', sceneStarted:false,
+    move:{from:{},to:{},residenceType:'Apartment', date:toISO(new Date(today.getTime()+86400000*21)), flexible:false, flexStart:'', flexEnd:'', homeSize:'1 Bedroom', stairsPickup:0, stairsDropoff:0, elevator:true, longCarry:false, packingHelp:false, coiRequired:false},
+    route:null, scanRoom:'Living Room', inventory:[], selectedMover:null, selectedPackage:'Standard', muvsafe:null, supplies:[], coiStatus:'Not requested', bookingConfirmed:false, messages:[{from:'mover',body:'Hi Jodi — we’re confirmed and COI-capable. Keep move communication inside MÜV for safety and recordkeeping.'}], trackingIndex:2,
+    portalView:'dashboard', lastConfirmedVolume:0
+  };
+  function save(){localStorage.setItem('muvState.v1', JSON.stringify(state));}
+
+  const addresses = [
+    {street:'11767 Leon Circle North', unit:'', city:'Parkland', state:'FL', zip:'33076', lat:26.317,lng:-80.284, label:'11767 Leon Circle North, Parkland, FL 33076'},
+    {street:'55 Water Street', unit:'12A', city:'Brooklyn', state:'NY', zip:'11201', lat:40.703,lng:-73.992, label:'55 Water Street, Brooklyn, NY 11201'},
+    {street:'200 Kent Avenue', unit:'4B', city:'Brooklyn', state:'NY', zip:'11249', lat:40.718,lng:-73.963, label:'200 Kent Avenue, Brooklyn, NY 11249'},
+    {street:'1087 Flushing Avenue', unit:'', city:'Brooklyn', state:'NY', zip:'11237', lat:40.704,lng:-73.928, label:'1087 Flushing Avenue, Brooklyn, NY 11237'},
+    {street:'1010 Wilshire Blvd', unit:'907', city:'Los Angeles', state:'CA', zip:'90017', lat:34.052,lng:-118.263, label:'1010 Wilshire Blvd, Los Angeles, CA 90017'},
+    {street:'1680 Michigan Ave', unit:'', city:'Miami Beach', state:'FL', zip:'33139', lat:25.792,lng:-80.139, label:'1680 Michigan Ave, Miami Beach, FL 33139'}
+  ];
+
+  const rooms = ['Living Room','Primary Bedroom','Bedroom','Kid’s Room','Kitchen','Bathroom','Office','Dining Room','Garage','Playroom','Media Room','Library','Closet','Laundry','Hallway','Balcony / Outdoor','Bathroom 2','Bathroom 3','Room 1','Room 2','Room 3'];
+  const timelines = {
+    'Living Room':[
+      det('3-seat sofa',.08,.42,.58,.28,70,120,'furniture',false,true,false,.93), det('coffee table',.36,.61,.22,.14,12,35,'furniture',false,false,false,.89), det('media console',.62,.40,.26,.18,22,80,'furniture',false,true,false,.86), det('55-inch TV',.67,.22,.18,.15,8,35,'electronics',true,false,false,.91), det('bookshelf',.12,.16,.18,.34,32,85,'furniture',false,true,false,.84), det('floor lamp',.82,.18,.07,.40,4,12,'fragile',true,false,false,.78), det('rug',.26,.73,.48,.12,6,25,'misc',false,false,false,.77), det('6 medium boxes',.05,.70,.18,.20,18,180,'boxes',false,true,false,.88,6)
+    ],
+    'Primary Bedroom':[det('queen mattress',.20,.44,.52,.28,60,110,'furniture',false,true,false,.92), det('bed frame',.18,.48,.56,.27,45,95,'furniture',false,true,true,.87), det('dresser',.68,.33,.22,.25,35,120,'furniture',false,true,false,.89), det('nightstand',.10,.46,.14,.15,8,30,'furniture',false,false,false,.86), det('mirror',.76,.12,.10,.30,6,25,'fragile',true,false,false,.84), det('wardrobe boxes',.06,.62,.18,.24,20,80,'boxes',false,false,false,.88,3)],
+    'Bedroom':[det('full mattress',.20,.45,.50,.26,48,90,'furniture',false,true,false,.9), det('dresser',.66,.34,.24,.24,35,120,'furniture',false,true,false,.88), det('lamp',.10,.24,.08,.28,4,12,'fragile',true,false,false,.72)],
+    'Office':[det('desk',.18,.43,.44,.26,30,90,'furniture',false,true,true,.9),det('office chair',.55,.50,.16,.22,12,35,'furniture',false,false,false,.86),det('monitor',.34,.30,.14,.14,4,12,'electronics',true,false,false,.88),det('printer',.68,.43,.14,.14,5,25,'electronics',true,false,false,.79),det('file cabinet',.75,.54,.16,.24,18,90,'furniture',false,true,false,.84),det('bookshelf',.07,.18,.18,.37,25,75,'furniture',false,true,false,.86)],
+    'Kitchen':[det('dining table',.22,.47,.40,.24,40,100,'furniture',false,true,true,.89),det('dining chairs x4',.12,.53,.50,.25,32,80,'furniture',false,false,false,.86,4),det('bar stools x2',.67,.46,.17,.26,12,30,'furniture',false,false,false,.83,2),det('microwave',.72,.25,.13,.10,5,30,'appliance',true,false,false,.78),det('dish boxes',.08,.68,.20,.22,18,150,'boxes',true,true,false,.9,3)],
+    'Garage':[det('bike',.10,.37,.30,.30,20,35,'misc',false,false,false,.88),det('storage bins x6',.45,.55,.25,.25,36,180,'boxes',false,true,false,.92,6),det('tool chest',.65,.48,.22,.20,18,160,'misc',false,true,false,.86),det('ladder',.82,.15,.07,.50,12,30,'misc',false,false,false,.84),det('lawn mower',.24,.60,.26,.22,30,90,'appliance',false,true,false,.83),det('treadmill',.48,.35,.36,.25,65,250,'furniture',false,true,false,.92)]
+  };
+  function det(name,x,y,width,height,volumeCuft,estimatedWeightLb,category,fragile,heavy,needsDisassembly,confidence,qty=1){return {id:uid(),name,normalizedName:name.toLowerCase().replace(/ x\d+|\d+ /g,'').trim(),bbox:{x,y,width,height},volumeCuft,estimatedWeightLb,category,fragile,heavy,needsDisassembly,confidence,qty,source:'DEMO_VIDEO'};}
+
+  const movers = [
+    {id:'atlas',name:'Atlas Blue Moving Co.',rating:4.9,reviews:418,tier:'Premium',phone:'(917) 555-0188',coi:true,capacity:1700,logo:'AB',available:'Confirmed',desc:'White-glove crews, COI-ready, strong apartment/building workflow.'},
+    {id:'settle',name:'SettleRight Movers',rating:4.8,reviews:287,tier:'Standard',phone:'(718) 555-0142',coi:true,capacity:1200,logo:'SR',available:'Confirmed',desc:'Balanced pricing, clean communication, furniture protection included.'},
+    {id:'district',name:'District Van & Crew',rating:4.7,reviews:193,tier:'Budget',phone:'(646) 555-0191',coi:false,capacity:800,logo:'DV',available:'Flexible-date match',desc:'Efficient small-team option for leaner moves and flexible windows.'}
+  ];
+  const vendors = [
+    ['Settled Estate Solutions','Estate sale companies','Verified estate sale planning for downsizing moves','$950+','Next week'],
+    ['Legacy Lane Estate Sales','Estate sale companies','Elegant, full-home estate sale coordination','$1,200+','May 8'],
+    ['Clear House Collective','Bulk removal / junk removal','Donation-first bulk removal with disposal tracking','$180+','Tomorrow'],
+    ['FreshStart Move-Out Cleaning','Cleaning services','Move-out deep cleaning and key-ready turnover','$240+','This week'],
+    ['Spark & Settle Cleaning Co.','Cleaners','Apartment cleanouts, fridge/oven detail, windows','$210+','Today'],
+    ['Box & Bin Lab','Moving supplies','Plastic bin rentals, wardrobe boxes, packing paper','$45+','Today'],
+    ['BrightDoor Deep Clean','Cleaning services','Post-move reset and premium deep cleans','$310+','Friday'],
+    ['KeyReady Cleaners','Cleaning services','Fast apartment turnover for management offices','$275+','Monday'],
+    ['BulkAway Pros','Bulk disposal','Oversized item haul-away and disposal photos','$160+','Tomorrow'],
+    ['Heirloom Home Transitions','Estate sale companies','Family-sensitive cleanouts and heirloom sorting','$1,500+','May 14'],
+    ['NestForm Interiors','Interior designers','Unpack-to-designed room setup','$750+','May 11'],
+    ['Utility Concierge','Utility setup','Internet, electric, gas, forwarding checklist','$35+','Today']
+  ];
+  const suppliesCatalog = [
+    {id:'studio',name:'Studio bundle',price:4900,items:'12 boxes, tape, paper, labels'},
+    {id:'one',name:'1-bedroom bundle',price:8900,items:'24 boxes, tape, paper, wardrobe box'},
+    {id:'two',name:'2-bedroom bundle',price:14900,items:'42 boxes, tape, dish packs, labels'},
+    {id:'bins',name:'Plastic bin rental',price:6900,items:'20 bins, delivery + pickup'},
+    {id:'fragile',name:'Fragile pack',price:3900,items:'Bubble wrap, dish inserts, glass dividers'}
+  ];
+
+  function totals(inv=state.inventory){
+    const volume = inv.reduce((s,i)=>s+(Number(i.volumeCuft)||0)*(Number(i.qty)||1),0);
+    const weight = inv.reduce((s,i)=>s+(Number(i.estimatedWeightLb)||0)*(Number(i.qty)||1),0);
+    const count = inv.reduce((s,i)=>s+(Number(i.qty)||1),0);
+    return {volume:Math.round(volume),weight:Math.round(weight),count};
+  }
+  function truckSnapshot(){
+    const t=totals();
+    const trucks=[['10\' box truck',400],['15\' box truck',800],['20\' box truck',1200],['26\' box truck',1700]];
+    const found = trucks.find(x=>t.volume<=x[1]) || ['Two trucks / large crew',3400];
+    return {name:found[0],cap:found[1],pct:clamp(Math.round(t.volume/found[1]*100),0,100),remaining:Math.max(0,found[1]-t.volume),...t};
+  }
+  function haversine(a,b){
+    if(!a.lat||!b.lat) return 12.4;
+    const R=3958.8, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+    const lat1=a.lat*Math.PI/180, lat2=b.lat*Math.PI/180;
+    const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+    return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))*1.25;
+  }
+  function estimateRoute(){
+    const mi = Math.max(3,haversine(state.move.from,state.move.to));
+    const mins = Math.round(mi/28*60 + 18);
+    state.route = {distanceMiles:Math.round(mi*10)/10,durationMinutes:mins,provider:'fallback'};
+    save();
+    return state.route;
+  }
+  function basePrice(mover, pkg){
+    const route = state.route || estimateRoute(); const t=totals();
+    let cents = 15000 + t.volume*450 + route.distanceMiles*225 + route.durationMinutes*75;
+    const m=state.move;
+    if(m.residenceType==='Apartment') cents*=1.05;
+    if(Number(m.stairsPickup)>0) cents*=1+.08*Number(m.stairsPickup);
+    if(Number(m.stairsDropoff)>0) cents*=1+.08*Number(m.stairsDropoff);
+    if(m.longCarry) cents*=1.08;
+    if(m.coiRequired) cents*=1.03;
+    if(state.inventory.some(i=>i.heavy||i.specialHandling)) cents*=1.08;
+    if(m.flexible) cents*=.95;
+    const mult={"Bare Bones":1,"Standard":1.15,"Full Service":1.35}[pkg||state.selectedPackage] || 1.15;
+    cents*=mult;
+    const tier={Budget:.92,Standard:1,Premium:1.12}[mover?.tier||'Standard'] || 1;
+    return Math.round(cents*tier);
+  }
+  let appStarted = false;
+  function startApp(){
+    if(appStarted) return;
+    appStarted = true;
+    document.getElementById('app').classList.remove('hidden');
+    render();
+  }
+  function shouldSkipOpening(){
+    const path = window.location.pathname.toLowerCase();
+    return path.startsWith('/mover') || path.startsWith('/admin') || sessionStorage.getItem('muvIntroPlayed') === '1';
+  }
+  function finishOpening(op){
+    sessionStorage.setItem('muvIntroPlayed','1');
+    if(op && op.parentNode) op.remove();
+    startApp();
+  }
+  const openingEl = document.getElementById('opening');
+  const bookEl = document.getElementById('bookBtn');
+  if(shouldSkipOpening()){
+    if(openingEl) openingEl.remove();
+    if(window.location.pathname.toLowerCase().startsWith('/mover')) {
+      state.activeTab = 'portal';
+      const possibleView = window.location.pathname.toLowerCase().split('/').filter(Boolean)[1];
+      if(['dashboard','leads','moves','calendar','inventory','messages','routes','crew','exports','profile'].includes(possibleView)) state.portalView = possibleView;
+    }
+    startApp();
+  } else if(bookEl && openingEl){
+    bookEl.addEventListener('click',()=>{
+      openingEl.classList.add('zip');
+      setTimeout(()=>{ startApp(); openingEl.classList.add('garage-opening'); },680);
+      setTimeout(()=>finishOpening(openingEl),1920);
+    }, { once:true });
+  }
+
+  document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{ state.activeTab=btn.dataset.tab; if(state.activeTab==='home' && !state.flow) state.flow='details'; save(); render(); }));
+  document.getElementById('moverPortalBtn').addEventListener('click',()=>{state.activeTab='portal'; state.portalView=state.portalView||'dashboard'; save(); render();});
+  const brandHome = document.getElementById('brandHome');
+  if(brandHome) brandHome.addEventListener('click',()=>{state.activeTab='home'; state.flow='details'; save(); render();});
+
+  function setTabs(){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.activeTab));}
+  function render(){
+    document.body.classList.toggle('portal-mode', state.activeTab==='portal');
+    setTabs();
+    const status = state.bookingConfirmed ? 'Booked · MyMÜV active' : state.inventory.length ? `${totals().count} items · ${truckSnapshot().name}` : state.route ? 'Route ready · scan next' : 'Ready to book';
+    document.getElementById('appStatus').textContent=status;
+    const main=document.getElementById('main');
+    if(state.activeTab==='home') renderHome(main);
+    if(state.activeTab==='pool') renderPool(main);
+    if(state.activeTab==='muvit') renderMuvIt(main);
+    if(state.activeTab==='market') renderMarket(main);
+    if(state.activeTab==='mymuv') renderMyMuv(main);
+    if(state.activeTab==='portal') renderPortal(main);
+  }
+
+  function sceneClass(){ const h=new Date().getHours(); if(h<10) return 'scene-morning'; if(h<17) return ''; if(h<20) return 'scene-evening'; return 'scene-night'; }
+  function renderHome(main){
+    if(state.flow==='scanner'){ openScanner(); return; }
+    if(state.flow==='review') return renderInventoryReview(main);
+    if(state.flow==='match') return renderMatch(main);
+    if(state.flow==='checkout') return renderCheckout(main);
+    main.innerHTML=`
+      <section class="card">
+        <div class="home-scene ${sceneClass()}">
+          <div class="sky"></div><div class="sun"></div>
+          <div class="house"><div class="roof"></div><div class="building"><div class="window w1"></div><div class="window w2"></div><div class="garage"></div><div class="door"></div></div><svg class="tiny-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div>
+        </div>
+        <div class="card home-form">
+          <div class="eyebrow">Home</div>
+          <h1 class="section-title">Tell us about your move.</h1>
+          <p class="subhead">We’ll tailor everything from here. Address, date, home type, route, scan, flat-rate quote — one calm flow.</p>
+          <div class="form-section grid two">
+            ${addressBlock('from','Moving from')}
+            ${addressBlock('to','Moving to')}
+          </div>
+          <div class="form-section grid four">
+            <div class="field"><label>Move date</label><input id="moveDate" type="date" min="${toISO(today)}" value="${state.move.date||''}"></div>
+            <div class="field"><label>Home size</label><select id="homeSize"><option>Studio</option><option>1 Bedroom</option><option>2 Bedroom</option><option>3 Bedroom</option><option>4+ Bedroom</option></select></div>
+            <div class="field"><label>Stairs at pickup</label><input id="stairsPickup" type="number" min="0" value="${state.move.stairsPickup||0}"></div>
+            <div class="field"><label>Stairs at dropoff</label><input id="stairsDropoff" type="number" min="0" value="${state.move.stairsDropoff||0}"></div>
+          </div>
+          <div class="form-section">
+            <label>Residence type</label>
+            <div class="grid five" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:8px">${['Apartment','House','Condo / townhouse','Storage unit','Other'].map(x=>`<button class="select-card ${state.move.residenceType===x?'active':''}" data-residence="${x}">🏠 ${x}</button>`).join('')}</div>
+          </div>
+          <div class="form-section grid two">
+            <label class="select-card"><input id="flexible" type="checkbox" ${state.move.flexible?'checked':''}> Flexible date window</label>
+            <label class="select-card"><input id="coiRequired" type="checkbox" ${state.move.coiRequired?'checked':''}> Building requires COI</label>
+            <label class="select-card"><input id="elevator" type="checkbox" ${state.move.elevator?'checked':''}> Elevator available</label>
+            <label class="select-card"><input id="longCarry" type="checkbox" ${state.move.longCarry?'checked':''}> Long carry expected</label>
+          </div>
+          <div id="flexDates" class="form-section grid two ${state.move.flexible?'':'hidden'}">
+            <div class="field"><label>Flexible start</label><input id="flexStart" type="date" min="${toISO(today)}" value="${state.move.flexStart||''}"></div>
+            <div class="field"><label>Flexible end</label><input id="flexEnd" type="date" min="${toISO(today)}" value="${state.move.flexEnd||''}"></div>
+          </div>
+          <div class="form-section grid two">
+            <div class="field"><label>Building access notes</label><textarea id="accessNotes" rows="3" placeholder="Loading dock, parking, elevator times, management contact…">${state.move.accessNotes||''}</textarea></div>
+            <div class="field"><label>Packing / handling notes</label><textarea id="handlingNotes" rows="3" placeholder="Fragile art, treadmill, oversized sectional…">${state.move.handlingNotes||''}</textarea></div>
+          </div>
+          <div class="spread form-section">
+            <div>${state.route?routePills():''}</div>
+            <button class="btn primary" id="continueScan">Continue to Scan →</button>
+          </div>
+        </div>
+      </section>`;
+    document.getElementById('homeSize').value=state.move.homeSize || '1 Bedroom';
+    attachForm();
+  }
+  function addressBlock(key,title){const a=state.move[key]||{};return `<div class="grid" style="gap:12px"><h3 style="margin:0;color:var(--navy)">${title}</h3><div class="field"><label>Street address</label><input class="addr" data-key="${key}" id="${key}Street" placeholder="Start typing an address" value="${a.street||''}" autocomplete="off"><div class="suggestions hidden" id="${key}Suggest"></div></div><div class="grid three"><div class="field"><label>Unit / Apt</label><input id="${key}Unit" value="${a.unit||''}" placeholder="4B"></div><div class="field"><label>City</label><input id="${key}City" value="${a.city||''}"></div><div class="field"><label>State</label><input id="${key}State" value="${a.state||''}" maxlength="2"></div></div><div class="field"><label>ZIP code</label><input id="${key}Zip" value="${a.zip||''}"></div></div>`}
+  function routePills(){const r=state.route; return `<span class="pill blue">Route: ${r.distanceMiles} mi</span><span class="pill blue">${r.durationMinutes} min</span><span class="pill green">Provider-ready fallback</span>`}
+  function attachForm(){
+    ['from','to'].forEach(k=>{
+      ['Unit','City','State','Zip'].forEach(f=>{const el=document.getElementById(k+f); if(el) el.oninput=()=>{state.move[k][f.toLowerCase()]=el.value; save();};});
+      const input=document.getElementById(k+'Street'), sug=document.getElementById(k+'Suggest');
+      input.oninput=()=>{ state.move[k].street=input.value; save(); const q=input.value.toLowerCase(); const matches=addresses.filter(a=>a.label.toLowerCase().includes(q)||a.street.toLowerCase().includes(q)).slice(0,5); sug.innerHTML=matches.map(a=>`<button data-label="${a.label}">${a.label}<br><small>${a.city}, ${a.state} ${a.zip}</small></button>`).join(''); sug.classList.toggle('hidden',!q||!matches.length); sug.querySelectorAll('button').forEach(b=>b.onclick=()=>{const a=addresses.find(x=>x.label===b.dataset.label); state.move[k]={...a}; save(); estimateRoute(); render();}); };
+    });
+    document.querySelectorAll('[data-residence]').forEach(b=>b.onclick=()=>{state.move.residenceType=b.dataset.residence; save(); render();});
+    const vals=['moveDate','homeSize','stairsPickup','stairsDropoff','accessNotes','handlingNotes','flexStart','flexEnd']; vals.forEach(id=>{const el=document.getElementById(id); if(el) el.oninput=()=>{state.move[id]=el.value; if(id==='moveDate') state.move.date=el.value; save();};});
+    ['flexible','coiRequired','elevator','longCarry'].forEach(id=>{const el=document.getElementById(id); if(el) el.onchange=()=>{state.move[id]=el.checked; if(id==='flexible') document.getElementById('flexDates').classList.toggle('hidden',!el.checked); save();};});
+    document.getElementById('continueScan').onclick=()=>{
+      const m=state.move; const ok=m.from.street&&m.from.city&&m.from.state&&m.from.zip&&m.to.street&&m.to.city&&m.to.state&&m.to.zip&&m.residenceType&&(m.date||m.flexible);
+      if(!ok) return toast('Add both addresses, ZIPs, date/flexible window, and residence type first.');
+      estimateRoute(); state.flow='scanner'; save(); render();
+    };
+  }
+
+  let scanTimer=null, currentDetection=null, scanIdx=0;
+  function openScanner(){
+    const mount=document.getElementById('scannerMount'); scanIdx=0; currentDetection=null;
+    mount.innerHTML=`<div class="scanner" id="scanner"><div class="scanner-top"><button class="room-chip" id="closeScan">← Back</button>${rooms.map(r=>`<button class="room-chip ${state.scanRoom===r?'active':''}" data-room="${r}">${r}</button>`).join('')}<button class="room-chip" id="customRoom">+ Custom</button></div><div class="scanner-body"><div class="camera" id="camera"><div class="room-illustration"><div class="floor"></div></div><div class="scan-shimmer"></div><div class="scan-indicator"><span class="dot"></span> Scanning ${state.scanRoom}…</div><div id="overlay"></div></div><div class="inventory-panel" id="scanPanel"></div></div></div>`;
+    document.getElementById('closeScan').onclick=()=>{clearInterval(scanTimer); mount.innerHTML=''; state.flow='details'; save(); render();};
+    document.getElementById('customRoom').onclick=()=>{const r=prompt('Room name?'); if(r){state.scanRoom=r; if(!timelines[r]) timelines[r]=[]; save(); openScanner();}};
+    document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>{state.scanRoom=b.dataset.room; save(); openScanner();});
+    renderScanPanel(); nextDetection(); scanTimer=setInterval(nextDetection,2800);
+  }
+  function nextDetection(){
+    const list=timelines[state.scanRoom] || timelines['Living Room'];
+    if(!list.length) return;
+    currentDetection={...list[scanIdx % list.length], id:uid()}; scanIdx++;
+    const key=state.scanRoom+'::'+currentDetection.normalizedName;
+    if(state.inventory.some(i=>i.key===key)) { renderOverlay(currentDetection,false); return; }
+    renderOverlay(currentDetection,true);
+  }
+  function renderOverlay(d,prompt=true){
+    const overlay=document.getElementById('overlay'); if(!overlay) return;
+    const left=d.bbox.x*100, top=d.bbox.y*100, width=d.bbox.width*100, height=d.bbox.height*100;
+    const promptLeft=clamp(left+width+2,4,72), promptTop=clamp(top,8,70);
+    overlay.innerHTML=`<div class="scan-box" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%"><span class="scan-label">${d.name}? · ${Math.round(d.confidence*100)}%</span></div>${prompt?`<div class="prompt" style="left:${promptLeft}%;top:${promptTop}%"><strong>Add ${d.name}?</strong><div style="color:#64748b;font-size:13px;margin-bottom:10px">${d.volumeCuft} cu ft · ${d.estimatedWeightLb} lb ${d.fragile?'· fragile':''} ${d.heavy?'· heavy':''}</div><div class="row"><button class="btn small ghost" id="skipDet">Skip</button><button class="btn small primary" id="addDet">Add</button></div></div>`:''}`;
+    if(prompt){document.getElementById('addDet').onclick=()=>addDetection(d); document.getElementById('skipDet').onclick=()=>{overlay.innerHTML='';};}
+  }
+  function addDetection(d){
+    const key=state.scanRoom+'::'+d.normalizedName;
+    const item={...d, id:uid(), key, room:state.scanRoom, qty:d.qty||1, source:'DEMO_VIDEO'};
+    state.inventory.push(item); save(); renderScanPanel(); renderOverlay(d,false); toast(`${d.name} added to ${state.scanRoom}.`);
+  }
+  function renderScanPanel(){
+    const panel=document.getElementById('scanPanel'); if(!panel) return;
+    const snap=truckSnapshot();
+    const byRoom=state.inventory.reduce((m,i)=>{(m[i.room]||(m[i.room]=[])).push(i);return m;},{});
+    panel.innerHTML=`<div class="spread"><div><b>${snap.count} items · ${snap.volume} cu ft · ${snap.name} · ${snap.pct}% full</b><div class="meter" style="margin-top:8px"><span style="width:${snap.pct}%"></span></div></div><div class="mini-truck-meter"><div class="fill" style="width:${snap.pct}%"></div></div></div><div class="items-list">${Object.entries(byRoom).map(([room,items])=>`<div><b style="font-size:12px;color:#0A2540">${room} · ${items.length}</b>${items.map(i=>itemRow(i)).join('')}</div>`).join('')||'<div class="pill amber">Add at least one item to continue.</div>'}</div><div class="spread" style="margin-top:12px"><button class="btn ghost small" id="manualAdd">+ Add manually</button><button class="btn primary" id="doneScan" ${state.inventory.length?'':'disabled'}>Done scanning →</button></div>`;
+    panel.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.inventory=state.inventory.filter(i=>i.id!==b.dataset.del); save(); renderScanPanel();});
+    panel.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{const i=state.inventory.find(x=>x.id===b.dataset.inc); i.qty++; save(); renderScanPanel();});
+    panel.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{const i=state.inventory.find(x=>x.id===b.dataset.dec); i.qty=Math.max(1,i.qty-1); save(); renderScanPanel();});
+    document.getElementById('manualAdd').onclick=openManualAdd;
+    document.getElementById('doneScan').onclick=()=>{clearInterval(scanTimer); document.getElementById('scannerMount').innerHTML=''; state.flow='review'; state.lastConfirmedVolume=state.lastConfirmedVolume||totals().volume; save(); render();};
+  }
+  function itemRow(i){return `<div class="item-row"><span>${i.name} <small style="color:#64748b">${i.fragile?' fragile':''}${i.heavy?' heavy':''}</small></span><span class="qty"><button data-dec="${i.id}">−</button>${i.qty}<button data-inc="${i.id}">+</button></span><button class="btn small ghost" data-del="${i.id}">×</button></div>`}
+  function openManualAdd(){
+    modal(`<h2>Add item manually</h2><div class="grid two"><div class="field"><label>Item name</label><input id="manName" placeholder="e.g. antique mirror"></div><div class="field"><label>Room</label><input id="manRoom" value="${state.scanRoom}"></div><div class="field"><label>Volume cu ft</label><input id="manVol" type="number" value="12"></div><div class="field"><label>Weight lb</label><input id="manW" type="number" value="40"></div></div><div class="grid two" style="margin-top:12px"><label class="select-card"><input id="manFrag" type="checkbox"> Fragile</label><label class="select-card"><input id="manHeavy" type="checkbox"> Heavy</label><label class="select-card"><input id="manDis" type="checkbox"> Needs disassembly</label><label class="select-card"><input id="manSpec" type="checkbox"> Special handling</label></div><div class="spread" style="margin-top:18px"><button class="btn ghost" onclick="MUV.closeModal()">Cancel</button><button class="btn primary" id="saveManual">Add item</button></div>`);
+    document.getElementById('saveManual').onclick=()=>{const name=document.getElementById('manName').value||'Manual item'; state.inventory.push({id:uid(),key:document.getElementById('manRoom').value+'::'+name.toLowerCase(),name,normalizedName:name.toLowerCase(),room:document.getElementById('manRoom').value,qty:1,volumeCuft:+document.getElementById('manVol').value||10,estimatedWeightLb:+document.getElementById('manW').value||30,category:'misc',fragile:document.getElementById('manFrag').checked,heavy:document.getElementById('manHeavy').checked,needsDisassembly:document.getElementById('manDis').checked,specialHandling:document.getElementById('manSpec').checked,source:'MANUAL',confidence:1}); save(); closeModal(); renderScanPanel();};
+  }
+
+  function renderInventoryReview(main){
+    const snap=truckSnapshot();
+    main.innerHTML=`<section class="card"><div class="eyebrow">Inventory Review</div><h1 class="section-title">MÜV understands your move.</h1><p class="subhead">Edit quantities, rooms, fragile/heavy tags, then continue to route-aware mover matching.</p>${summaryBar()}<div class="grid two"><div class="card" style="box-shadow:none"><h3>Truck snapshot</h3><div class="mini-truck-meter" style="width:220px;height:86px"><div class="fill" style="width:${snap.pct}%"></div></div><h2>${snap.name}</h2><p>${snap.volume} cu ft · ${snap.weight.toLocaleString()} lb · ${snap.pct}% full · ${snap.remaining} cu ft remaining</p><button class="btn ghost" id="reopenScan">Reopen scanner</button></div><div class="card" style="box-shadow:none"><h3>Route preview</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p>${state.route?`${state.route.distanceMiles} miles · ${state.route.durationMinutes} minutes`:'Route not estimated yet'}</p></div></div><table class="table"><thead><tr><th>Item</th><th>Room</th><th>Qty</th><th>Cu ft</th><th>Tags</th><th></th></tr></thead><tbody>${state.inventory.map(i=>`<tr><td><input data-edit-name="${i.id}" value="${i.name}"></td><td><input data-edit-room="${i.id}" value="${i.room}"></td><td><input data-edit-qty="${i.id}" type="number" min="1" value="${i.qty}"></td><td><input data-edit-vol="${i.id}" type="number" value="${i.volumeCuft}"></td><td>${i.fragile?'Fragile ':''}${i.heavy?'Heavy ':''}${i.needsDisassembly?'Disassembly ':''}${i.specialHandling?'Special ':''}</td><td><button class="btn small ghost" data-delete-item="${i.id}">Delete</button></td></tr>`).join('')}</tbody></table><div class="spread"><button class="btn ghost" id="backDetails">Back to details</button><button class="btn primary" id="showQuotes">Show vetted movers →</button></div></section>`;
+    main.querySelectorAll('input[data-edit-name],input[data-edit-room],input[data-edit-qty],input[data-edit-vol]').forEach(el=>el.oninput=()=>{const i=state.inventory.find(x=>x.id===Object.values(el.dataset)[0]); if(el.dataset.editName) i.name=el.value; if(el.dataset.editRoom) i.room=el.value; if(el.dataset.editQty) i.qty=+el.value||1; if(el.dataset.editVol) i.volumeCuft=+el.value||0; save();});
+    main.querySelectorAll('[data-delete-item]').forEach(b=>b.onclick=()=>{state.inventory=state.inventory.filter(i=>i.id!==b.dataset.deleteItem); save(); render();});
+    document.getElementById('reopenScan').onclick=()=>{state.flow='scanner'; save(); render();};
+    document.getElementById('backDetails').onclick=()=>{state.flow='details'; save(); render();};
+    document.getElementById('showQuotes').onclick=()=>{if(!state.route) estimateRoute(); state.flow='match'; save(); render();};
+  }
+  function summaryBar(){ const s=truckSnapshot(), r=state.route||estimateRoute(); return `<div class="summary-bar"><div class="metric"><b>${s.count}</b><span>items scanned</span></div><div class="metric"><b>${s.volume}</b><span>cubic feet</span></div><div class="metric"><b>${s.weight.toLocaleString()}</b><span>estimated pounds</span></div><div class="metric"><b>${r.distanceMiles}</b><span>route miles</span></div></div>`;}
+
+  function renderMatch(main){
+    main.innerHTML=`<section class="card"><div class="eyebrow">Route + Price Match</div><h1 class="section-title">Top vetted movers.</h1><p class="subhead">Quotes appear only after inventory and route are complete. Prices use volume, weight, route distance, residence complexity, COI, and package level.</p>${summaryBar()}<div class="grid three">${movers.map(m=>quoteCard(m)).join('')}</div><div class="spread" style="margin-top:18px"><button class="btn ghost" id="backReview">Back to inventory</button><button class="btn ghost" id="poolToggle">Check MÜVPool savings</button></div></section>`;
+    main.querySelectorAll('[data-pkg]').forEach(b=>b.onclick=()=>{state.selectedPackage=b.dataset.pkg; save(); render();});
+    main.querySelectorAll('[data-select-mover]').forEach(b=>b.onclick=()=>{state.selectedMover=movers.find(m=>m.id===b.dataset.selectMover); state.flow='checkout'; save(); render();});
+    document.getElementById('backReview').onclick=()=>{state.flow='review'; save(); render();};
+    document.getElementById('poolToggle').onclick=()=>{state.activeTab='pool'; save(); render();};
+  }
+  function quoteCard(m){
+    const price=basePrice(m,state.selectedPackage);
+    return `<article class="quote-card"><div class="spread"><div class="row"><div class="avatar">${m.logo}</div><div><h3 style="margin:0">${m.name}</h3><div class="row"><span class="pill green">Vetted</span><span class="pill">⭐ ${m.rating} (${m.reviews})</span></div></div></div></div><p style="color:#64748b">${m.desc}</p><div class="row"><span class="pill blue">${m.available}</span><span class="pill ${m.coi?'green':'amber'}">${m.coi?'COI-capable':'COI on request'}</span><span class="pill">${state.route.distanceMiles} mi · ${state.route.durationMinutes} min</span></div><div class="row" style="margin-top:12px">${['Bare Bones','Standard','Full Service'].map(p=>`<button class="btn small ${state.selectedPackage===p?'primary':'ghost'}" data-pkg="${p}">${p}</button>`).join('')}</div><div class="quote-price">${money(price)}</div><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><div class="spread" style="margin-top:12px"><span class="pill blue">${truckSnapshot().name}</span><button class="btn primary" data-select-mover="${m.id}">Select this mover</button></div></article>`;
+  }
+  function renderCheckout(main){
+    const m=state.selectedMover||movers[0]; const quote=basePrice(m,state.selectedPackage); const muvsafe={Basic:4900,Plus:9900,Premium:18900}; const suppliesTotal=state.supplies.reduce((s,id)=>s+(suppliesCatalog.find(x=>x.id===id)?.price||0),0); const safeCost=state.muvsafe?muvsafe[state.muvsafe]:0;
+    main.innerHTML=`<section class="card"><div class="eyebrow">Checkout</div><h1 class="section-title">Lock the move.</h1><p class="subhead">MüvSafe, COI, supplies, payment placeholder, and booking confirmation.</p><div class="grid two"><div class="card" style="box-shadow:none"><h3>${m.name}</h3><p>${state.selectedPackage} · ${state.move.date||'Flexible'} · ${state.route.distanceMiles} mi · ${state.route.durationMinutes} min</p>${summaryMini()}<h3>MüvSafe protection</h3><div class="grid three">${Object.entries(muvsafe).map(([tier,price])=>`<button class="select-card ${state.muvsafe===tier?'active':''}" data-safe="${tier}"><b>${tier}</b><span>${money(price)}</span></button>`).join('')}</div><h3>COI</h3><label class="select-card"><input id="checkoutCoi" type="checkbox" ${state.move.coiRequired?'checked':''}> My building requires a Certificate of Insurance</label><div class="field" style="margin-top:10px"><label>Building management email</label><input id="coiEmail" placeholder="management@building.com" value="${state.move.coiEmail||''}"></div></div><div class="card" style="box-shadow:none"><h3>Supplies</h3><div class="grid">${suppliesCatalog.map(s=>`<label class="select-card ${state.supplies.includes(s.id)?'active':''}"><input data-supply="${s.id}" type="checkbox" ${state.supplies.includes(s.id)?'checked':''}> <span><b>${s.name}</b><br><small>${s.items} · ${money(s.price)}</small></span></label>`).join('')}</div><h3>Price breakdown</h3><p class="spread"><span>Move quote</span><b>${money(quote)}</b></p><p class="spread"><span>MüvSafe</span><b>${money(safeCost)}</b></p><p class="spread"><span>Supplies</span><b>${money(suppliesTotal)}</b></p><hr><p class="spread" style="font-size:22px"><span>Total</span><b>${money(quote+safeCost+suppliesTotal)}</b></p><button class="btn primary" id="confirmBooking" style="width:100%">Confirm booking → MyMÜV</button></div></div><div class="spread" style="margin-top:18px"><button class="btn ghost" id="backMatch">Back to movers</button></div></section>`;
+    main.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>{state.muvsafe=b.dataset.safe; save(); render();});
+    main.querySelectorAll('[data-supply]').forEach(ch=>ch.onchange=()=>{state.supplies=ch.checked?[...new Set([...state.supplies,ch.dataset.supply])]:state.supplies.filter(x=>x!==ch.dataset.supply); save(); render();});
+    document.getElementById('checkoutCoi').onchange=e=>{state.move.coiRequired=e.target.checked; state.coiStatus=e.target.checked?'Requested from mover':'Not requested'; save();};
+    document.getElementById('coiEmail').oninput=e=>{state.move.coiEmail=e.target.value; save();};
+    document.getElementById('backMatch').onclick=()=>{state.flow='match'; save(); render();};
+    document.getElementById('confirmBooking').onclick=()=>{state.bookingConfirmed=true; state.activeTab='mymuv'; state.flow='details'; state.lastConfirmedVolume=totals().volume; state.coiStatus=state.move.coiRequired?'Requested from mover':'Not requested'; save(); render();};
+  }
+  function summaryMini(){const s=truckSnapshot();return `<div class="grid two"><span class="pill blue">${s.volume} cu ft</span><span class="pill blue">${s.weight.toLocaleString()} lb</span><span class="pill blue">${s.name}</span><span class="pill green">${s.pct}% full</span></div>`}
+
+  function renderMyMuv(main){
+    const m=state.selectedMover||movers[0]; const s=truckSnapshot(); const revision=Math.abs(s.volume-(state.lastConfirmedVolume||s.volume))/(state.lastConfirmedVolume||s.volume)*100;
+    main.innerHTML=`<section class="card"><div class="eyebrow">MyMÜV</div><h1 class="section-title">Your move command center.</h1><p class="subhead">Payment, secure messaging, tracking, timeline, inventory, documents, COI, and supplies live here.</p><div class="quote-card" style="margin:18px 0"><div class="spread"><div class="row"><div class="avatar">${m.logo}</div><div><h2 style="margin:0">${m.name}</h2><p style="margin:4px 0;color:#64748b">${state.selectedPackage} · ${state.move.date||'Flexible'} · Arrival window 9:00–11:00 AM</p><div class="row"><a class="btn small ghost" href="tel:${m.phone.replace(/\D/g,'')}">Call ${m.phone}</a><span class="pill green">Crew assigned</span><span class="pill ${state.coiStatus==='Not requested'?'':'amber'}">COI: ${state.coiStatus}</span></div></div></div><button class="btn primary" onclick="document.getElementById('chatText').focus()">Message</button></div><p class="pill blue">For safety and recordkeeping, keep move communication in MÜV.</p></div>${revision>10?`<div class="pill amber" style="margin-bottom:14px">Inventory changed by ${Math.round(revision)}%. Your mover will review these updates before move day.</div>`:''}<div class="grid two"><div class="card" style="box-shadow:none"><h3>Payment</h3><p class="spread"><span>Booking total</span><b>${money(basePrice(m,state.selectedPackage)+(state.muvsafe?9900:0)+state.supplies.length*4900)}</b></p><p class="pill green">Payment placeholder ready · Stripe test-mode architecture</p><h3>Truck tracking</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p class="pill blue">Status: Truck en route · ${state.route?.distanceMiles||12.4} mi</p><h3>Move timeline</h3><div class="timeline">${['Scan completed','Inventory confirmed','Route optimized','Mover selected','Payment confirmed','COI submitted','Crew assigned','Truck en route','Loading','Delivered'].map((x,i)=>`<div class="timeline-item"><span class="check ${i<7?'':'pending'}">${i<7?'✓':'·'}</span><div><b>${x}</b><br><small>${i<7?'Complete':'Upcoming'}</small></div></div>`).join('')}</div></div><div class="card" style="box-shadow:none"><h3>Secure messaging</h3><div class="chat-box"><div class="chat-messages" id="chatMessages">${state.messages.map(msg=>`<div class="msg ${msg.from==='me'?'me':''}">${msg.body}</div>`).join('')}</div><div class="chat-input"><input id="chatText" placeholder="Message mover or crew"><button class="btn small primary" id="sendChat">Send</button></div></div><h3>Inventory snapshot</h3>${summaryMini()}<div class="items-list" style="max-height:260px">${state.inventory.map(i=>itemRowStatic(i)).join('')}</div><div class="row"><button class="btn ghost" id="mymuvScan">Reopen scanner</button><button class="btn ghost" id="mymuvManual">+ Add item</button></div><h3>Documents</h3><div class="grid"><span class="pill blue">Booking confirmation</span><span class="pill blue">Payment receipt</span><span class="pill blue">MüvSafe ${state.muvsafe||'not selected'}</span><span class="pill blue">COI documents</span><span class="pill blue">Supplies receipt</span></div></div></div></section>`;
+    const cm=document.getElementById('chatMessages'); cm.scrollTop=cm.scrollHeight;
+    document.getElementById('sendChat').onclick=()=>{const t=document.getElementById('chatText'); if(t.value.trim()){state.messages.push({from:'me',body:t.value.trim()}); t.value=''; save(); render();}};
+    document.getElementById('mymuvScan').onclick=()=>{state.activeTab='home'; state.flow='scanner'; save(); render();};
+    document.getElementById('mymuvManual').onclick=openManualAdd;
+  }
+  function itemRowStatic(i){return `<div class="item-row"><span>${i.name}<br><small>${i.room} · ${i.volumeCuft} cu ft · ${i.estimatedWeightLb} lb</small></span><span>x${i.qty}</span><span>${i.fragile?'Fragile ':''}${i.heavy?'Heavy':''}</span></div>`}
+
+  function renderPool(main){
+    const hasBase=state.move.from.street&&state.move.to.street&&state.inventory.length;
+    main.innerHTML=`<section class="card"><div class="eyebrow">MÜVPool</div><h1 class="section-title">Shared-route moving.</h1><p class="subhead">For flexible dates, MÜVPool checks route compatibility, truck capacity, detour ratio, expected savings, and CO₂ reduction.</p><div class="grid two"><div class="card" style="box-shadow:none"><h3>Your pool profile</h3><p>${hasBase?'Using your current move details.':'Scan inventory first or use the quick estimate below.'}</p><div class="grid two"><div class="field"><label>Flexible start</label><input id="poolStart" type="date" min="${toISO(today)}" value="${state.move.flexStart||state.move.date||''}"></div><div class="field"><label>Flexible end</label><input id="poolEnd" type="date" min="${toISO(today)}" value="${state.move.flexEnd||''}"></div></div>${summaryMini()}<button class="btn primary" id="findPools" style="margin-top:14px">Find route-compatible pools</button></div><div class="card" style="box-shadow:none"><h3>Route pooling animation</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p class="pill green">Fallback route optimization ready · Google provider architecture slot</p></div></div><div id="poolResults" class="grid three" style="margin-top:18px">${poolCards()}</div></section>`;
+    document.getElementById('findPools').onclick=()=>{document.getElementById('poolResults').innerHTML=poolCards(true);};
+  }
+  function poolCards(force=false){ if(!state.inventory.length&&!force) return `<div class="pill amber">Complete a scan to unlock real MÜVPool matching.</div>`; const base=basePrice(movers[1],'Standard'); const cards=[{score:94,save:.24,co2:38,parties:3,detour:1.11,date:'Jun 10–Jun 15',cap:420},{score:88,save:.18,co2:31,parties:2,detour:1.16,date:'Jun 12–Jun 14',cap:280},{score:81,save:.12,co2:22,parties:2,detour:1.22,date:'Jun 15–Jun 17',cap:610}]; return cards.map((c,i)=>`<article class="pool-card"><div class="spread"><h3>Pool Match ${i+1}</h3><span class="pill green">${c.score}% compatible</span></div><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p class="quote-price">Save ${money(base*c.save)}</p><div class="grid two"><span class="pill blue">${c.date}</span><span class="pill blue">${c.parties} parties</span><span class="pill green">${c.co2} lb CO₂ saved</span><span class="pill ${c.detour<1.2?'green':'amber'}">${c.detour}× detour</span><span class="pill blue">${c.cap} cu ft remaining</span><span class="pill blue">Your stop #${i+1}</span></div><p style="color:#64748b">Route corridor overlap, date window, capacity, provider availability, and savings all meet MÜVPool thresholds.</p><button class="btn primary" style="width:100%">Join Pool</button></article>`).join(''); }
+
+  function renderMuvIt(main){
+    const items=['couch','mattress','dining table','fridge','Peloton','dresser','TV stand','washer/dryer','bed frame','bookshelf','desk','treadmill']; const item=state.muvitItem||'couch'; const vol={couch:70,mattress:60,'dining table':40,fridge:55,Peloton:38,dresser:35,'TV stand':22,'washer/dryer':65,'bed frame':45,bookshelf:32,desk:30,treadmill:65}[item]||30; const dist=state.route?.distanceMiles||8.5; const est=(2500+vol*120+dist*140+(item==='treadmill'?2000:0));
+    main.innerHTML=`<section class="card"><div class="eyebrow">MÜVIt</div><h1 class="section-title">Single-item moves.</h1><p class="subhead">Scan or quick-tap the item, enter pickup/dropoff, get a route-aware quote, then track it.</p><div class="grid two"><div><h3>What are you moving?</h3><div class="grid three">${items.map(x=>`<button class="select-card ${item===x?'active':''}" data-muvit-item="${x}">${x}</button>`).join('')}</div><h3>Pickup + dropoff</h3><div class="grid two">${addressTiny('pickup')} ${addressTiny('dropoff')}</div></div><div class="card" style="box-shadow:none"><h3>Quote</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p class="quote-price">${money(est)}</p><div class="grid two"><span class="pill blue">${vol} cu ft</span><span class="pill blue">${dist} miles</span><span class="pill green">Driver assigned</span><span class="pill blue">Today / Schedule</span></div><button class="btn primary" style="width:100%;margin-top:16px">Confirm MÜVIt</button></div></div></section>`;
+    main.querySelectorAll('[data-muvit-item]').forEach(b=>b.onclick=()=>{state.muvitItem=b.dataset.muvitItem; save(); render();});
+  }
+  function addressTiny(k){return `<div class="card" style="box-shadow:none;padding:14px"><h4>${k==='pickup'?'Pickup':'Drop-off'}</h4><div class="field"><label>Street</label><input placeholder="Street address"></div><div class="grid two"><div class="field"><label>Unit</label><input></div><div class="field"><label>ZIP</label><input></div></div><div class="grid two"><div class="field"><label>Contact name</label><input></div><div class="field"><label>Phone</label><input></div></div><label class="select-card"><input type="checkbox"> Stairs/elevator details</label></div>`}
+
+  function renderMarket(main){
+    main.innerHTML=`<section class="card"><div class="eyebrow">MÜVMarket</div><h1 class="section-title">Everything else you need.</h1><p class="subhead">Curated move-adjacent services: organizers, designers, handymen, supplies, storage, estate sales, donation pickup, junk removal, cleaners, painters, utilities, pet relocation, and more.</p><div class="row" style="margin:18px 0">${['before move','during move','after move','cleaning','estate sale','bulk disposal','supplies'].map(x=>`<span class="pill blue">${x}</span>`).join('')}</div><div class="grid three">${vendors.map(v=>`<article class="vendor-card"><div class="avatar">${v[0].split(' ').map(w=>w[0]).slice(0,2).join('')}</div><h3>${v[0]}</h3><span class="pill blue">${v[1]}</span><p style="color:#64748b">${v[2]}</p><div class="grid two"><span class="pill">⭐ 4.${Math.floor(Math.random()*4)+6} (${Math.floor(Math.random()*200)+45})</span><span class="pill green">Verified</span><span class="pill blue">${v[3]}</span><span class="pill blue">${v[4]}</span></div><button class="btn primary" style="width:100%;margin-top:14px">Request quote</button></article>`).join('')}</div></section>`;
+  }
+
+  function portalMeta(view){
+    return {
+      dashboard:['Dashboard','Operational view for moving company owners, dispatchers, and crew managers.'],
+      leads:['Leads','Accept, decline, price, and convert incoming customer requests without leaving the portal.'],
+      moves:['Moves','Booked jobs, crew assignments, customer notes, building access, and payment status.'],
+      calendar:['Calendar','Dispatch-ready calendar with move windows, crew capacity, and route load.'],
+      inventory:['Inventory','Room-by-room customer inventories, heavy/fragile flags, and volume changes.'],
+      messages:['Messages','Customer, dispatcher, and crew communication kept inside MÜV for safety and records.'],
+      routes:['Routes','Capacity-aware routing, MÜVPool opportunities, truck utilization, and stop order.'],
+      crew:['Crew','Permissions, assignment status, crew roles, and issue reporting.'],
+      exports:['Exports','Download leads, bookings, inventory, COI, payout, and crew data.'],
+      profile:['Profile','Customizable mover profile, service area, COI settings, terms, and policies.']
+    }[view] || ['Dashboard','Operational view for moving company owners, dispatchers, and crew managers.'];
+  }
+  function renderPortal(main){
+    const tabs=['dashboard','leads','moves','calendar','inventory','messages','routes','crew','exports','profile'];
+    const [title,sub]=portalMeta(state.portalView||'dashboard');
+    main.innerHTML=`<section class="portal-app"><header class="portal-header"><div class="portal-header-inner"><div class="portal-top-row"><button class="portal-brand" id="portalHomeLogo" aria-label="MÜV mover dashboard"><span class="logo-wordmark"><span class="logo-main">MÜV</span><span class="logo-tag">MOVE SMART. BREATHE EASY.</span></span></button><button class="portal-customer-link" id="portalCustomerApp">Customer app</button></div><nav class="portal-tabs" aria-label="Mover portal navigation">${tabs.map(x=>`<button class="portal-tab ${state.portalView===x?'active':''}" data-portal="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</nav></div></header><div class="portal-body"><span class="portal-kicker">Mover Portal</span><h1 class="portal-title">${title}</h1><p class="portal-subhead">${sub}</p><div id="portalPane">${portalPane()}</div></div></section>`;
+    main.querySelectorAll('[data-portal]').forEach(b=>b.onclick=()=>{state.portalView=b.dataset.portal; save(); render();});
+    document.getElementById('portalCustomerApp').onclick=()=>{state.activeTab='home'; state.flow='details'; save(); render();};
+    document.getElementById('portalHomeLogo').onclick=()=>{state.portalView='dashboard'; save(); render();};
+  }
+  function portalPane(){
+    const view=state.portalView||'dashboard';
+    const inventoryPreview = `<div class="portal-inventory-preview"><div class="portal-inventory-head"><h3 style="margin:0">Living Room</h3><span class="portal-badge">2</span></div><div class="portal-inventory-row"><div><h3 style="margin:0 0 6px">TV</h3><span class="portal-muted">Living Room · 10 cu ft</span> <span class="portal-badge warn">Fragile</span></div><span class="portal-badge">x1</span></div><div class="portal-inventory-row"><div><h3 style="margin:0 0 6px">Sofa</h3><span class="portal-muted">Living Room · 70 cu ft · Heavy</span></div><span class="portal-badge">x1</span></div></div>`;
+    if(view==='dashboard') return `<div class="portal-dashboard-grid"><div class="portal-card"><h3>New leads</h3><span class="portal-stat-number">3</span><p>Ready to accept or decline.</p></div><div class="portal-card"><h3>Booked jobs</h3><span class="portal-stat-number">1</span><p>Crew and truck status synced to MyMÜV.</p></div><div class="portal-card"><h3>Capacity</h3><span class="portal-stat-number">88</span><p>Provider capacity score.</p></div><div class="portal-card portal-wide"><h3>Inventory preview</h3>${inventoryPreview}</div></div><div class="portal-split"><div class="portal-card"><h3>Today’s dispatch queue</h3><table class="portal-mini-table"><tr><th>Time</th><th>Move</th><th>Status</th></tr><tr><td>9:00 AM</td><td>Williamsburg 1BR</td><td><span class="pill green">Crew assigned</span></td></tr><tr><td>1:30 PM</td><td>Brooklyn → Miami</td><td><span class="pill amber">COI needed</span></td></tr><tr><td>4:00 PM</td><td>MÜVIt couch pickup</td><td><span class="pill blue">Driver ready</span></td></tr></table></div><div class="portal-card"><h3>Route health</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p>2 trucks · 5 stops · 31.4 miles · 78% capacity utilization</p></div></div>`;
+    if(view==='leads') return `<div class="portal-list-grid">${['Brooklyn to Miami · 2BR','Greenpoint studio · flexible','Jersey City storage unit'].map((x,i)=>`<div class="portal-card"><span class="pill ${i===0?'green':'blue'}">Lead</span><h3>${x}</h3><p>Inventory, route, access notes, customer budget, and COI requirements are ready to review.</p><button class="btn primary">Accept lead</button></div>`).join('')}</div>`;
+    if(view==='moves') return `<div class="portal-list-grid">${['Williamsburg 1BR · confirmed','Park Slope townhouse · pending COI','MÜVIt Peloton · today'].map((x,i)=>`<div class="portal-card"><span class="pill ${i===0?'green':'amber'}">Move</span><h3>${x}</h3><p>Route, crew, messages, payment, and inventory change alerts are connected to MyMÜV.</p><button class="btn ghost">Open move</button></div>`).join('')}</div>`;
+    if(view==='calendar') return `<div class="portal-card"><h3>Dispatch calendar</h3><table class="portal-mini-table"><tr><th>Date</th><th>Window</th><th>Job</th><th>Crew</th></tr><tr><td>Today</td><td>9–11 AM</td><td>Williamsburg 1BR</td><td>Mara / Ana / Dev</td></tr><tr><td>Tomorrow</td><td>12–3 PM</td><td>Brooklyn → Miami load</td><td>Team B</td></tr><tr><td>Friday</td><td>Flexible</td><td>MÜVPool corridor</td><td>Pending</td></tr></table></div>`;
+    if(view==='inventory') return `<div class="portal-split"><div class="portal-card"><h3>Customer inventory</h3>${inventoryPreview}</div><div class="portal-card"><h3>Volume change alerts</h3><span class="portal-stat-number">+14%</span><p>Customer added storage bins and a treadmill after original scan. Review quote before dispatch.</p><button class="btn primary">Approve revision</button></div></div>`;
+    if(view==='messages') return `<div class="portal-split"><div class="portal-card"><h3>Priority threads</h3>${['Customer asked about elevator window','Crew reported parking issue','Management requested COI revision'].map(x=>`<p class="select-card">${x}</p>`).join('')}</div><div class="portal-card"><h3>Message composer</h3><div class="field"><label>Reply</label><textarea rows="5">Hi Jodi — we are confirmed, COI-capable, and will keep updates inside MÜV.</textarea></div><button class="btn primary" style="margin-top:12px">Send</button></div></div>`;
+    if(view==='crew') return `<div class="portal-list-grid">${['Mara Lee · Crew lead','Ana Ortiz · Driver','Dev Patel · Mover','Sofia Kim · Dispatcher'].map(x=>`<div class="portal-card"><h3>${x}</h3><p class="pill green">Active</p><p>Can view assigned moves, inventory, route/address, building notes, send customer messages, update move status, and report issues.</p><button class="btn ghost">Edit permissions</button></div>`).join('')}</div>`;
+    if(view==='routes') return `<div class="portal-split"><div class="portal-card"><h3>Today’s optimized route</h3><div class="route-map"><span class="pin a"></span><span class="pin b"></span><svg class="tracking-truck truck-svg" viewBox="0 0 320 160" aria-hidden="true" focusable="false"><rect x="32" y="54" width="176" height="62" rx="16" class="truck-box-svg"></rect><path d="M210 70h46l32 34v12h-78z" class="truck-cab-svg"></path><rect x="222" y="78" width="30" height="20" rx="5" class="truck-window-svg"></rect><path d="M64 72h76" class="truck-line-svg"></path><circle cx="84" cy="122" r="18" class="truck-wheel-svg"></circle><circle cx="244" cy="122" r="18" class="truck-wheel-svg"></circle></svg></div><p>2 trucks · 5 stops · 31.4 miles · 78% capacity utilization</p><span class="pill amber">COI needed at stop 2</span></div><div class="portal-card"><h3>MÜVPool opportunities</h3><p>3 compatible pooled shipments found. Detour ratio below 1.18 and savings above 14%.</p><button class="btn primary">Run optimization</button></div></div>`;
+    if(view==='exports') return `<div class="portal-list-grid">${['leads.csv','bookings.csv','inventory.json','route-plans.csv','coi-status.csv','crew-assignments.csv'].map(x=>`<div class="portal-card"><h3>${x}</h3><p>Exportable, filterable, sortable operational data.</p><button class="btn ghost">Download</button></div>`).join('')}</div>`;
+    if(view==='profile') return `<div class="portal-card"><h3>Customizable mover profile</h3><div class="grid two"><input value="Atlas Blue Moving Co."><input value="(917) 555-0188"><input value="dispatch@atlasblue.test"><input value="NYC, Brooklyn, Queens, Jersey City"><textarea rows="4">COI-ready apartment specialists with full-service packing and premium building workflows.</textarea><textarea rows="4">License, insurance, cancellation policy, service area, operating hours, terms.</textarea></div><button class="btn primary" style="margin-top:18px">Save profile</button></div>`;
+    return '';
+  }
+
+  function modal(html){document.getElementById('modalMount').innerHTML=`<div class="modal-backdrop"><div class="modal">${html}</div></div>`;}
+  function closeModal(){document.getElementById('modalMount').innerHTML='';}
+  window.MUV={closeModal};
+  function toast(text){
+    const t=document.createElement('div'); t.className='pill blue'; t.textContent=text; t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2000;box-shadow:0 18px 40px rgba(10,37,64,.18);background:#fff'; document.body.appendChild(t); setTimeout(()=>t.remove(),2600);
+  }
+})();
+</script>
+</body>
+</html>
