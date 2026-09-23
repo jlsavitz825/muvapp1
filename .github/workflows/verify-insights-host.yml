@@ -1,0 +1,35 @@
+name: Verify MUV insights hosting
+on:
+  push:
+    paths:
+      - .github/workflows/verify-insights-host.yml
+  workflow_dispatch:
+permissions: {}
+jobs:
+  inspect-public-host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check public DNS and existing website without changing it
+        shell: bash
+        run: |
+          echo '--- Domain DNS ---'
+          dig +time=3 +tries=1 +short NS my-muv.com
+          dig +time=3 +tries=1 +short CNAME www.my-muv.com
+          dig +time=3 +tries=1 +short A my-muv.com
+          echo '--- Public HTTP checks ---'
+          python3 - <<'PY'
+          import json, re, urllib.request, urllib.error
+          urls = ['https://www.my-muv.com/', 'https://my-muv.com/', 'http://www.my-muv.com/', 'https://www.my-muv.com/insights', 'https://jlsavitz825.github.io/muvapp1/research/']
+          for url in urls:
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent': 'MUV-Insights-Deployment-Verification/1.0'})
+                  with urllib.request.urlopen(req, timeout=15) as response:
+                      body = response.read(200000).decode('utf-8', 'replace')
+                      selected = {k: v for k, v in response.headers.items() if k.lower() in ['server','location','content-type','x-vercel-id','x-powered-by','x-nf-request-id','cf-ray','x-robots-tag','content-security-policy','x-frame-options']}
+                      print(json.dumps({'url': url, 'final_url': response.url, 'status': response.status, 'headers': selected, 'title': re.findall(r'<title[^>]*>(.*?)</title>', body, re.S|re.I), 'script_src': re.findall(r'<script[^>]*src=[\"\x27]([^\"\x27]+)',body,re.I)[:12], 'canonical':re.findall(r'<link[^>]*rel=[\"\x27]canonical[\"\x27][^>]*>',body,re.I)[:2], 'body_excerpt':re.sub(r'\s+',' ',body)[:3500]}, ensure_ascii=False))
+              except urllib.error.HTTPError as error:
+                  print(json.dumps({'url': url, 'status': error.code, 'server': error.headers.get('Server'), 'body_excerpt': error.read(1500).decode('utf-8','replace')}))
+              except Exception as error:
+                  print(json.dumps({'url': url, 'error': str(error)}))
+          PY
